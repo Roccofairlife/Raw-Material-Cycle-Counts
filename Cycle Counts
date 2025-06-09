@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cycle Count App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+    }
+
+    input,
+    button {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Raw Material Cycle Counts</h1>
+
+  <label for="barcode">Item Barcode:</label><br />
+  <input type="text" id="barcode" /><br />
+
+  <label for="quantity">Counted Quantity:</label><br />
+  <input type="number" id="quantity" /><br />
+
+  <button onclick="addEntry()">Add Entry</button>
+  <button onclick="exportToCSV()">Export to Excel (CSV)</button>
+
+  <table id="data-table">
+    <thead>
+      <tr>
+        <th>Item Barcode</th>
+        <th>Counted Quantity</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    function addEntry() {
+      const barcode = document.getElementById('barcode').value.trim();
+      const quantity = document.getElementById('quantity').value.trim();
+      const date = new Date().toLocaleDateString();
+      if (!barcode || !quantity) {
+        alert('Please fill in both fields.');
+        return;
+      }
+      const table = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+      const row = table.insertRow();
+      row.insertCell(0).textContent = barcode;
+      row.insertCell(1).textContent = quantity;
+      row.insertCell(2).textContent = date;
+      document.getElementById('barcode').value = '';
+      document.getElementById('quantity').value = '';
+      document.getElementById('barcode').focus();
+    }
+
+    function exportToCSV() {
+      let csv = 'Item Barcode,Counted Quantity,Date\n';
+      const rows = document.querySelectorAll('table tr');
+      for (const row of rows) {
+        const cols = row.querySelectorAll('td, th');
+        const rowData = [...cols].map(col => '"' + col.innerText + '"').join(',');
+        csv += rowData + '\n';
+      }
+      const blob = new Blob([csv], {
+        type: 'text/csv'
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cycle_count.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+
+</html>
